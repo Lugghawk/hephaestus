@@ -4,12 +4,27 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npm run build:live",
+    "build:live": "nodemon --exec ./node_modules/.bin/ts-node -- ./hephaestus.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/node": "^8.0.53",
+    "nodemon": "^1.12.1",
+    "ts-node": "^3.3.0",
     "typescript": "^2.6.1"
+  },
+  "dependencies": {
+    "bufferutil": "^3.0.3",
+    "discord.js": "^11.2.1",
+    "erlpack": "github:hammerandchisel/erlpack",
+    "pg": "^7.4.0",
+    "reflect-metadata": "^0.1.10",
+    "sodium": "^2.0.3",
+    "typeorm": "^0.1.6",
+    "uws": "^9.14.0"
   }
 }
