@@ -3,6 +3,7 @@ import "reflect-metadata"
 import { DestinyItem } from "./entity/DestinyItem"
 import {createConnection} from "typeorm";
 import { Repository } from 'typeorm/repository/Repository';
+import { ItemInfoMessage } from './messages/item_info_message';
 
 const Discord = require('discord.js')
 const client = new Discord.Client();
@@ -25,8 +26,9 @@ client.on('message', (message: Message) => {
     while(matches = inlineBacktickRegexp.exec(message.content)){
       var match = matches[1];
       var matched_item = match.replace(backtickRegexp, "");
-      repo.find({name: match}).then(async item => {
-        if (item.length != 0) message.reply(item);
+      repo.findOne({name: match}).then(async item => {
+        if (item == null) return;
+        message.reply('', {embed: ItemInfoMessage.create(item)})
       });
     }
   }
