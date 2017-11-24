@@ -5,8 +5,10 @@
    "main": "index.js",
    "scripts": {
       "test": "echo \"Error: no test specified\" && exit 1",
-      "start": "ts-node src/index.ts",
-      "build:live": "nodemon --exec ./node_modules/.bin/ts-node -- ./hephaestus.ts"
+      "start": "npm run build:live",
+      "oldstart": "ts-node src/index.ts",
+      "build:live": "nodemon --exec ./node_modules/.bin/ts-node -- src/hephaestus.ts",
+      "migrate": "ts-node src/destiny_item_extractor.ts"
    },
    "keywords": [],
    "author": "",
@@ -24,6 +26,7 @@
       "pg": "^7.3.0",
       "reflect-metadata": "^0.1.10",
       "sodium": "^2.0.3",
+      "sqlite3": "^3.1.13",
       "typeorm": "0.1.6",
       "uws": "^9.14.0"
    }
