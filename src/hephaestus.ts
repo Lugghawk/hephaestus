@@ -17,7 +17,16 @@ createConnection().then(async connection => {
   repo = connection.getRepository(DestinyItem);
   console.log("Configured Database");
 });
-client.on('ready', () => { console.log ("Logged in!"); });
+client.on('ready', () => { 
+  console.log ("Logged in!"); 
+  client.user.setPresence({
+    status: "online",
+    game: {
+      name: "Armory"
+    }
+  });
+  if (client.user.username != "Hephaestus") client.user.setUsername("Hephaestus");
+});
 
 client.on('message', (message: Message) => {
   console.log("Incoming Message: " + message.content);

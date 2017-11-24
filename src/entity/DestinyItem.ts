@@ -17,7 +17,10 @@ export class DestinyItem {
     iconUrl: string;
 
     @Column()
-    itemTypeAndDisplayName: string;
+    itemTypeAndDisplayName?: string;
+
+    @Column()
+    rarity?: string;
 
     public toString = () : string => {
         return `
@@ -25,6 +28,7 @@ export class DestinyItem {
         name: ${this.name}
         description: ${this.description}
         iconUrl: ${this.iconUrl}
-        itemTypeAndDisplayName: ${this.itemTypeAndDisplayName}`
+        itemTypeAndDisplayName: ${this.itemTypeAndDisplayName},
+        rarity: ${this.rarity}`
     }
 }
