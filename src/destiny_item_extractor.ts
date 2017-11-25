@@ -3,7 +3,7 @@ import "reflect-metadata"
 import { Entity, Column, createConnection, PrimaryColumn } from "typeorm";
 import { Connection } from "typeorm/connection/Connection";
 import { Repository } from "typeorm/repository/Repository";
-import { DestinyItem } from "./entity/DestinyItem"
+import { DestinyItem, DestinyItemFactory, DestinyItemWeapon, DestinyItemArmor } from "./entity/DestinyItem"
 import { PartialGuild } from "discord.js";
 
 
@@ -17,21 +17,31 @@ export class DestinyInventoryItemDefinition {
 }
 class DestinyItemMigrator {
 
-    repo: Repository<DestinyItem>;
+    itemRepo: Repository<DestinyItem>;
+    weaponRepo: Repository<DestinyItemWeapon>;
+    armorRepo: Repository<DestinyItemArmor>;
     constructor(connection: Connection) {
-        this.repo = connection.getRepository(DestinyItem);
-        this.repo.clear(); //Clear the weapon repo.
+        this.itemRepo = connection.getRepository(DestinyItem);
+        this.weaponRepo = connection.getRepository(DestinyItemWeapon);
+        this.armorRepo = connection.getRepository(DestinyItemArmor);
+        this.itemRepo.clear(); //Clear the weapon repo.
+        this.weaponRepo.clear();
+        this.armorRepo.clear();
     }
     addItem(item: DestinyItem): Promise<DestinyItem> {
-        return this.repo.save(item);
+        if (item.getType() == "Item") return this.itemRepo.save(item);   
+        if (item.getType() == "Weapon") return this.weaponRepo.save(item);
+        if (item.getType() == "Armor") return this.armorRepo.save(item);
     }
-
 }
-var migrator: DestinyItemMigrator;
-createConnection().then(async connection => {
-    console.log("creating item migrator");
-    migrator = new DestinyItemMigrator(connection);
-})
+var migrator: Promise<DestinyItemMigrator> = new Promise<DestinyItemMigrator>((resolve, reject) => {
+    createConnection().then(async connection => {
+        try {
+            console.log("creating item migrator");
+            resolve(new DestinyItemMigrator(connection));
+        } catch (e) { reject (e) };
+    });
+});
 createConnection({
     type: "sqlite",
     database: "destiny_world_sql_content",
@@ -47,22 +57,17 @@ createConnection({
     items.forEach(item => {
         var jsonItem = JSON.parse(item.json)
         if (["Legendary", "Exotic", "Rare"].indexOf(jsonItem.inventory.tierTypeName) > -1){
-            var destinyItem: DestinyItem = new DestinyItem();
-            destinyItem.id = item.id;
-            destinyItem.name = jsonItem.displayProperties.name;
-            destinyItem.description = jsonItem.displayProperties.description;
-            if (jsonItem.displayProperties.icon == null) {
-                destinyItem.iconUrl = "";
-            } else {
-                destinyItem.iconUrl = jsonItem.displayProperties.icon;
-            }
-            destinyItem.itemTypeAndDisplayName = jsonItem.itemTypeDisplayName;
-            destinyItem.rarity = jsonItem.inventory.tierTypeName;
-            migrator.addItem(destinyItem).then((addedItem) => {
-                console.log("added: " + destinyItem);
-            }).catch((error) => {
-                console.log("error: " + error);
+            try {
+                var destinyItem: DestinyItem = DestinyItemFactory.create(jsonItem);
+                if (destinyItem.itemTypeAndDisplayName == null) return;
+                migrator.then(destinyItemMigrator => {
+                    destinyItemMigrator.addItem(destinyItem).then((addedItem) => {
+                    console.log("added: " + destinyItem);
+                }).catch((error) => {
+                    console.log("error: " + error);
+                });
             });
+            }catch (e){ console.log(`Something bad happened importing ${jsonItem.displayProperties.name}: ${e}`)}
         }
     })
 }).catch
