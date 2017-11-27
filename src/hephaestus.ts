@@ -33,22 +33,25 @@ client.on('ready', () => {
   if (client.user.username != "Hephaestus") client.user.setUsername("Hephaestus");
 });
 
+function fetchOneItem<T>(item: string, repo: Repository<T> ): Promise<T> {
+  return repo.createQueryBuilder().where("LOWER(name) = LOWER(:item)", {item}).getOne().catch();
+}
+
 client.on('message', (message: Message) => {
   console.log("Incoming Message: " + message.content);
   if (client.user != message.author){
     var matches = {};
     while(matches = inlineBacktickRegexp.exec(message.content)){
-      var match = matches[1];
-      var matched_item = match.replace(backtickRegexp, "");
-      itemRepo.findOne({name: match}).then(async item => {
+      var match = matches[1].replace(backtickRegexp, "");
+      fetchOneItem(match, itemRepo).then(async item => {
         if (item == null) return;
         message.reply('', {embed: ItemInfoMessage.createItemInfoMessage(item)})
       });
-      weaponRepo.findOne({name: match}).then(async item => {
+      fetchOneItem(match, weaponRepo).then(async item => {
         if (item == null) return;
         message.reply('', {embed: ItemInfoMessage.createWeaponInfoMessage(item)})
       });
-      armorRepo.findOne({name: match}).then(async item => {
+      fetchOneItem(match, armorRepo).then(async item => {
         if (item == null) return;
         message.reply('', {embed: ItemInfoMessage.createArmorInfoMessage(item)})
       });
