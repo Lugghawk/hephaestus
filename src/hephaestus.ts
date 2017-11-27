@@ -4,6 +4,8 @@ import { DestinyItem, DestinyItemWeapon, DestinyItemArmor } from "./entity/Desti
 import {createConnection} from "typeorm";
 import { Repository } from 'typeorm/repository/Repository';
 import { ItemInfoMessage } from './messages/item_info_message';
+import { Connection } from 'typeorm/connection/Connection';
+import { DestinyItemMigrator } from './migration/migrator';
 
 const Discord = require('discord.js')
 const client = new Discord.Client();
@@ -14,7 +16,16 @@ var armorRepo: Repository<DestinyItemArmor>;
 
 const inlineBacktickRegexp = new RegExp(/`(.*?)`/g)
 const backtickRegexp = new RegExp(/`/g);
+
+function migrateRequired(connection: Connection): Promise<boolean> {
+  return connection.getRepository(DestinyItem).createQueryBuilder().getMany().then(items => items.length == 0);
+}
 createConnection().then(async connection => {
+  const doMigrate = await migrateRequired(connection);
+  if (doMigrate) {
+    const migrator = new DestinyItemMigrator();
+    migrator.migrate(connection);
+  }
   itemRepo = connection.getRepository(DestinyItem);
   armorRepo = connection.getRepository(DestinyItemArmor);
   weaponRepo = connection.getRepository(DestinyItemWeapon);

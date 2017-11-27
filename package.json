@@ -2,13 +2,12 @@
    "name": "hephaestus",
    "version": "1.0.0",
    "description": "",
-   "main": "index.js",
+   "main": "hephaestus.js",
    "scripts": {
       "test": "echo \"Error: no test specified\" && exit 1",
-      "start": "npm run build:live",
-      "oldstart": "ts-node src/index.ts",
-      "build:live": "nodemon --exec ./node_modules/.bin/ts-node -- src/hephaestus.ts",
-      "migrate": "ts-node src/destiny_item_extractor.ts"
+      "start": "ts-node src/hephaestus.ts",
+      "start-inline": "npm run build:live",
+      "build:live": "nodemon --exec ./node_modules/.bin/ts-node -- src/hephaestus.ts"
    },
    "keywords": [],
    "author": "",

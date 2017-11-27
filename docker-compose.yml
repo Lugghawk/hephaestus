@@ -1,5 +1,13 @@
 version: '3'
 services:
+  web:
+    build: .
+    depends_on:
+      - "postgres"
+    links:
+      - "postgres:postgres"
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
 
   postgres:
     image: "postgres:9.6.1"
