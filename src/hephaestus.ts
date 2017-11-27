@@ -7,12 +7,11 @@ import { ItemInfoMessage } from './messages/item_info_message';
 
 const Discord = require('discord.js')
 const client = new Discord.Client();
-function greeter(person: string){
-  return "Hello, " + person;
-}
+
 var itemRepo: Repository<DestinyItem>;
 var weaponRepo: Repository<DestinyItemWeapon>;
 var armorRepo: Repository<DestinyItemArmor>;
+
 const inlineBacktickRegexp = new RegExp(/`(.*?)`/g)
 const backtickRegexp = new RegExp(/`/g);
 createConnection().then(async connection => {
